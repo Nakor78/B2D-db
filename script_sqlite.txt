@@ -1,19 +1,69 @@
 /* Tables creation */
-CREATE TABLE users(user_id VARCHAR(10), username TEXT, password VARCHAR(8), balance DOUBLE);
-CREATE TABLE goods(good_id VARCHAR(10), name TEXT, description TEXT, price DOUBLE, amount DOUBLE, picture BLOB);
-CREATE TABLE orders(order_id VARCHAR(10), user_id VARCHAR(10), good_id VARCHAR(10), time DATE, purchase_quantity INT, total_price DOUBLE);
-CREATE TABLE shipping_address(address_id VARCHAR(10), user_id VARCHAR(10), full_address TEXT, zip_code VARCHAR(5), tel VARCHAR(10));
 
-/* Tables populate */
-INSERT INTO users VALUES('1000000001', 'smith', 'abcdefgh', 2200);
-INSERT INTO users VALUES('1000000002', 'brown', 'ijklmnop', 1300);
-INSERT INTO goods VALUES('2000000001', 'oculus rift', 'vr hardware by facebook', 599, 1, readfile('oculus_rift.jpg'));
-INSERT INTO goods VALUES('2000000002', 'parrot drone', 'a drone by parrot', 899, 1, readfile('parrot_drone.jpg'));
-INSERT INTO orders VALUES('3000000001', '1000000001', '2000000001', '2016-02-15', 7, 4193);
-INSERT INTO orders VALUES('3000000002', '1000000002', '2000000002', '2016-03-10', 4, 3596);
-INSERT INTO shipping_address VALUES('4000000001', '1000000001', '26 Place de l''Opéra PARIS', '75009', '0134151515');
-INSERT INTO shipping_address VALUES('4000000002', '1000000002', '33 Place Vendôme PARIS', '75001', '0134202020');
+CREATE TABLE User
+(
+	uid VARCHAR(10),
+ 	username TEXT, 
+	password VARCHAR(8),
+	balance DOUBLE,
+	CONSTRAINT pk_User PRIMARY KEY (uid)
+);
+
+CREATE TABLE Good
+(
+	gid VARCHAR(10),
+	name TEXT, 
+	description TEXT, 
+	price DOUBLE, 
+	amount DOUBLE, 
+	picture BLOB, 
+	CONSTRAINT pk_Good PRIMARY KEY (gid)
+);
+
+CREATE TABLE Ordert
+(
+	oid VARCHAR(10), 
+	uid VARCHAR(10), 
+	gid VARCHAR(10), 
+	time DATE, 
+	purchase_quantity INT, 
+	total_price DOUBLE, 
+	CONSTRAINT pk_Ordert PRIMARY KEY (oid), 
+	CONSTRAINT fk_Ordert_uid FOREIGN KEY (uid) REFERENCES User (uid), 
+	CONSTRAINT fk_Ordert_gid FOREIGN KEY (gid) REFERENCES Good (gid)
+);
+
+CREATE TABLE Shipping
+(
+	sid VARCHAR(10), 
+	uid VARCHAR(10), 
+	full_address TEXT, 
+	zip_code VARCHAR(5), 
+	tel VARCHAR(10), 
+	CONSTRAINT pk_Shipping PRIMARY KEY (uid),
+	CONSTRAINT fk_Shipping_uid FOREIGN KEY (uid) REFERENCES User (uid)
+);
+
+/* Tables population */
+
+INSERT INTO User VALUES('1000000001', 'smith', 'abcdefgh', 2200);
+INSERT INTO User VALUES('1000000002', 'brown', 'ijklmnop', 1300);
+
+INSERT INTO Good VALUES('2000000001', 'oculus rift', 'vr hardware by facebook', 599, 1, readfile('oculus_rift.jpg'));
+INSERT INTO Good VALUES('2000000002', 'parrot drone', 'a drone by parrot', 899, 1, readfile('parrot_drone.jpg'));
+
+INSERT INTO Ordert VALUES('3000000001', '1000000001', '2000000001', '2016-02-15', 7, 4193);
+INSERT INTO Ordert VALUES('3000000002', '1000000002', '2000000002', '2016-03-10', 4, 3596);
+
+INSERT INTO Shipping VALUES('4000000001', '1000000001', '26 Place de l''Opéra PARIS', '75009', '0134151515');
+INSERT INTO Shipping VALUES('4000000002', '1000000002', '33 Place Vendôme PARIS', '75001', '0134202020');
 
 /* Examples of requests */
-SELECT username, time, total_price FROM users, orders WHERE users.user_id = orders.user_id ORDER BY total_PRICE DESC;
-SELECT name, price, amount FROM goods ORDER BY price DESC;
+SELECT username, time, total_price 
+FROM User, Ordert 
+WHERE User.uid = Ordert.uid 
+ORDER BY total_PRICE DESC;
+
+SELECT name, price, amount 
+FROM Good 
+ORDER BY price DESC;
